@@ -35,41 +35,57 @@
 
     <script>
 
-      const myForm = document.querySelector('form');
-      const nameInput = document.querySelector('#name');
-      const emailInput = document.querySelector('#email');
-      const phoneInput = document.querySelector('#phone');
-      const msg = document.createElement('div');
+const myForm = document.querySelector('form');
+const nameInput = document.querySelector('#name');
+const emailInput = document.querySelector('#email');
+const phoneInput = document.querySelector('#phone');
+const userList = document.querySelector('#users');
 
-      const userList = document.querySelector('#users');
+myForm.addEventListener('submit', onSubmit);
 
+function onSubmit(e) {
+  e.preventDefault();
 
-      myForm.addEventListener('submit', onSubmit);
+  const userData = { name: nameInput.value, email: emailInput.value, phone: phoneInput.value };
+  localStorage.setItem('userData', JSON.stringify(userData));
+  const li = document.createElement('li');
+  li.innerHTML = `
+    Name: ${userData.name}, Email: ${userData.email}, Phone: ${userData.phone} 
+    <button class="edit-btn">Edit</button>
+    <button class="delete-btn">Delete</button>
+  `;
+  userList.appendChild(li);
+  nameInput.value = '';
+  emailInput.value = '';
+  phoneInput.value = '';
+}
 
-      function onSubmit(e) {
-        e.preventDefault();
+userList.addEventListener('click', e => {
+  if (e.target.classList.contains('delete-btn')) {
+    localStorage.removeItem('userData');
+    e.target.parentElement.remove();
+  } else if (e.target.classList.contains('edit-btn')) {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    nameInput.value = userData.name;
+    emailInput.value = userData.email;
+    phoneInput.value = userData.phone;
+    e.target.parentElement.remove();
+    localStorage.removeItem('userData');
+  }
+});
 
-        if (nameInput.value === '' || emailInput.value === '' || phoneInput.value === '') {
+const storedData = JSON.parse(localStorage.getItem('userData'));
+if (storedData) {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    Name: ${storedData.name}, Email: ${storedData.email}, Phone: ${storedData.phone} 
+    <button class="edit-btn">Edit</button>
+    <button class="delete-btn">Delete</button>
+  `;
+  userList.appendChild(li);
+}
 
-          return null;
-        } else {
-          const userData = { name: nameInput.value, email: emailInput.value, phone: phoneInput.value };
-          localStorage.setItem('userData', JSON.stringify(userData));
-          const li = document.createElement('li');
-          li.appendChild(document.createTextNode('Name: ' + userData.name + ', Email: ' + userData.email + ', Phone: ' + userData.phone));
-          userList.appendChild(li);
-          nameInput.value = '';
-          emailInput.value = '';
-          phoneInput.value = '';
-        }
-      }
-
-      const storedData = JSON.parse(localStorage.getItem('userData'));
-      if (storedData) {
-        const li = document.createElement('li');
-        li.appendChild(document.createTextNode('Name: ' + storedData.name + ', Email: ' + storedData.email + ', Phone: ' + storedData.phone));
-        userList.appendChild(li);
-      }
+      
     </script>
   </body>
 </html>
